@@ -1,3 +1,4 @@
+import numpy
 import matplotlib.pyplot as pyplot
 
 class Animation:
@@ -89,4 +90,3 @@ class Animation:
         self.canvas.set_data(self.image)
         pyplot.draw()
         pyplot.pause(0.0001)
-
