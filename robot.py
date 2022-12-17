@@ -91,8 +91,6 @@ class Robot:
                         ni.moveto = (xi, yi, ci)
                         cells.append(ni)
             
-            
-            
             return False
 
 
@@ -191,17 +189,18 @@ class Robot:
             if x < minx: minx = x
             if y < miny: miny = y
              
-        for j in range(miny, maxy + 1):
+              
+        for i in range(miny, maxy + 1):
             row = ''
-            for i in range(minx, maxx + 1):
-                if (i, j) in self.grid:
-                    cell = self.grid[(i, j)]
+            for j in range(minx, maxx + 1):
+                if (j, i) in self.grid:
+                    cell = self.grid[(j, i)]
                     if cell.wall:
                         row += '.'
                     elif cell.visits == 0:
                         row += '?'
                     else:
-                        if i == self.current.x and j == self.current.y:
+                        if i == self.current.y and j == self.current.x:
                             row += '*'
                         else:
                             row += ' '
@@ -255,8 +254,8 @@ class Robot:
             if animation:
                 print(move)
             
-#            print("\npress any key to do the selected move...")
-#            input('')
+            # print("\npress any key to do the selected move...")
+            # input('')
             
             # do the move
             result = self.maze.go(move, animation)
@@ -286,4 +285,3 @@ class Robot:
         self.steps = self.maze.steps
         
         return self.steps
-
