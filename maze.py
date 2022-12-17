@@ -38,8 +38,9 @@ class Maze:
         ''' save the maze to file '''
         
         # replace the smile with 'r' symbol
-        m, y = self.map, self.startij[0]
-        m[y] = m[y].replace('☻', 'r')
+        m = self.map
+        y, x = self.startij
+        m[y] = m[y][:x] + 'r' + m[y][x+1:]
         
         with open(outfile, 'w') as f:
             f.write("\n".join(m) + "\n")
@@ -57,24 +58,24 @@ class Maze:
         w = len(self.map[0])
         
         # create the numerical representation of the maze
-        self.Z = numpy.zeros((w, h), dtype = int)
+        self.Z = numpy.zeros((h, w), dtype = int)
         mapping = {' ':0, '.':1, 'X':2, 'r':3, '☻':3}
         y = 0
         for row in self.map:
             x = 0
             for cell in row:
-                self.Z[x, y] = mapping[cell]
+                self.Z[y, x] = mapping[cell]
                 x += 1
             y += 1
         
         # set the starting coordinates of the robot and exit gate position
         self.startij = self.exitij = None
-        for i in range(w):
-            for j in range(h):
+        for i in range(h):
+            for j in range(w):
                 if self.Z[i, j] == 3:
-                    self.startij = (j, i)
+                    self.startij = (i, j)
                 elif self.Z[i, j] == 2:
-                    self.exitij = (j, i)
+                    self.exitij = (i, j)
                 if self.startij and self.exitij:
                     break
                     
@@ -152,7 +153,7 @@ class Maze:
         w = len(self.map[0])
         h = len(self.map)
         
-        steps = numpy.ones((w, h), dtype = int) * -1
+        steps = numpy.ones((h, w), dtype = int) * -1
         steps[ay, ax] = 0
             
         stack = [(ay,ax)]
@@ -175,11 +176,14 @@ class Maze:
 
     def generate(self, rows = 64, cols = 64, density = 30):
     
-        w = rows
-        h = cols
+        w = cols
+        h = rows
+
+        print(str(w) + ','+ str(h))
 
         # initialize the maze cells and draw the border around it
-        Z = numpy.zeros((w, h), dtype = int)
+        Z = numpy.zeros((h, w), dtype = int)
+        
         Z[0, :] = Z[:, 0] = Z[h - 1, :] = Z[:, w - 1] = 1
         
         # add some walls to the maze
@@ -194,9 +198,9 @@ class Maze:
         # create ASCII representation of the maze
         self.map = []
         mapping = [' ', '.']
-        for i in range(w):
+        for i in range(h):
             row = ''
-            for j in range(h):
+            for j in range(w):
                 row += mapping[Z[i, j]]
             self.map.append(row)
     
@@ -205,10 +209,11 @@ class Maze:
         while True:
             (ry, rx) = (randint(1, h - 2), randint(1, w - 2))
             (ey, ex) = (randint(1, h - 2), randint(1, w - 2))
-            steps = self.stepsto((ry, rx), (ey, ex))
-            if steps:
-                self.minsteps = steps
-                break
+            if (ry, rx) != (ey, ex):
+                steps = self.stepsto((ry, rx), (ey, ex))
+                if steps:
+                    self.minsteps = steps
+                    break
         
         Z[ey, ex] = 2
         Z[ry, rx] = 3
@@ -221,4 +226,3 @@ class Maze:
         self.Z = Z
         
     
-
